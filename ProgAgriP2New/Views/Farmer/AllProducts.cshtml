@@ -1,0 +1,94 @@
+﻿@model IEnumerable<ProgAgriP2New.Models.ViewModels.ProductViewModel>
+
+@{
+    ViewData["Title"] = "All Farmers Products";
+}
+
+<div class="container">
+    <h2>All Available Products</h2>
+
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-primary">Back to My Products</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Filter Products</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="AllProducts" method="post">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="category">Category:</label>
+                        <select class="form-control" id="category" name="category">
+                            <option value="">All Categories</option>
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category" selected="@(ViewBag.SelectedCategory == category)">@category</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a asp-action="AllProducts" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Farmer</th>
+                        <th>Contact</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Production Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td>@product.FarmerName</td>
+                            <td>
+                                @if (ViewBag.FarmerContacts.ContainsKey(product.FarmerId))
+                                {
+                                    <div>Email: @ViewBag.FarmerContacts[product.FarmerId].Email</div>
+                                    @if (!string.IsNullOrEmpty(ViewBag.FarmerContacts[product.FarmerId].PhoneNumber))
+                                    {
+                                        <div>Phone: @ViewBag.FarmerContacts[product.FarmerId].PhoneNumber</div>
+                                    }
+                                }
+                            </td>
+                            <td>@product.Name</td>
+                            <td>@product.Category</td>
+                            <td>@product.ProductionDate.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No products found with the selected filters.
+        </div>
+    }
+</div>
