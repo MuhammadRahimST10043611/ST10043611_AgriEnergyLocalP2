@@ -34,6 +34,22 @@ namespace ProgAgriP2New.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(Employee employee)
+        {
+            _context.Employees.Update(employee);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int employeeId)
+        {
+            var employee = await _context.Employees.FindAsync(employeeId);
+            if (employee != null)
+            {
+                _context.Employees.Remove(employee);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<bool> ValidateCredentialsAsync(string email, string password)
         {
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email);

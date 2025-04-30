@@ -8,6 +8,8 @@ namespace ProgAgriP2New.Repositories
         Task<Employee> GetByEmailAsync(string email);
         Task<IEnumerable<Employee>> GetAllAsync();
         Task AddAsync(Employee employee);
+        Task UpdateAsync(Employee employee);
+        Task DeleteAsync(int employeeId);
         Task<bool> ValidateCredentialsAsync(string email, string password);
     }
 }

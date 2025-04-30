@@ -7,8 +7,8 @@ namespace ProgAgriP2New.Services
     {
         Task<Farmer> GetByIdAsync(int farmerId);
         Task<IEnumerable<Farmer>> GetAllAsync();
-        Task AddAsync(FarmerViewModel farmerViewModel);
-        Task UpdateAsync(FarmerViewModel farmerViewModel);  // New method
-        Task DeleteAsync(int farmerId);  // New method
+        Task<(bool success, string errorMessage)> AddAsync(FarmerViewModel farmerViewModel);
+        Task<(bool success, string errorMessage)> UpdateAsync(FarmerViewModel farmerViewModel);
+        Task DeleteAsync(int farmerId);
     }
 }

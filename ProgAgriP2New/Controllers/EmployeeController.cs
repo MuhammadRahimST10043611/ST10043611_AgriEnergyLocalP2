@@ -8,11 +8,16 @@ namespace ProgAgriP2New.Controllers
     {
         private readonly IProductService _productService;
         private readonly IFarmerService _farmerService;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IProductService productService, IFarmerService farmerService)
+        public EmployeeController(
+            IProductService productService,
+            IFarmerService farmerService,
+            IEmployeeService employeeService)
         {
             _productService = productService;
             _farmerService = farmerService;
+            _employeeService = employeeService;
         }
 
         public async Task<IActionResult> Index()
@@ -70,14 +75,19 @@ namespace ProgAgriP2New.Controllers
 
             if (ModelState.IsValid)
             {
-                await _farmerService.AddAsync(model);
-                return RedirectToAction("ManageFarmers");
+                var (success, errorMessage) = await _farmerService.AddAsync(model);
+
+                if (success)
+                {
+                    return RedirectToAction("ManageFarmers");
+                }
+
+                ViewBag.ErrorMessage = errorMessage;
             }
 
             return View(model);
         }
 
-        // New methods for managing farmers
         public async Task<IActionResult> ManageFarmers()
         {
             // Check if user is authenticated as an employee
@@ -134,11 +144,151 @@ namespace ProgAgriP2New.Controllers
 
             if (ModelState.IsValid)
             {
-                await _farmerService.UpdateAsync(model);
-                return RedirectToAction("ManageFarmers");
+                var (success, errorMessage) = await _farmerService.UpdateAsync(model);
+
+                if (success)
+                {
+                    return RedirectToAction("ManageFarmers");
+                }
+
+                ViewBag.ErrorMessage = errorMessage;
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> DeleteFarmer(int id)
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            await _farmerService.DeleteAsync(id);
+            return RedirectToAction("ManageFarmers");
+        }
+
+        public async Task<IActionResult> ManageEmployees()
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var employees = await _employeeService.GetAllAsync();
+            return View(employees);
+        }
+
+        public IActionResult AddEmployee()
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEmployee(EmployeeViewModel model)
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var (success, errorMessage) = await _employeeService.AddAsync(model);
+
+                if (success)
+                {
+                    return RedirectToAction("ManageEmployees");
+                }
+
+                ViewBag.ErrorMessage = errorMessage;
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> EditEmployee(int id)
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var employee = await _employeeService.GetByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new EmployeeViewModel
+            {
+                EmployeeId = employee.EmployeeId,
+                Name = employee.Name,
+                Email = employee.Email,
+                Password = employee.Password
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditEmployee(EmployeeViewModel model)
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var (success, errorMessage) = await _employeeService.UpdateAsync(model);
+
+                if (success)
+                {
+                    return RedirectToAction("ManageEmployees");
+                }
+
+                ViewBag.ErrorMessage = errorMessage;
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            // Check if user is authenticated as an employee
+            var userType = HttpContext.Session.GetString("UserType");
+
+            if (userType != "Employee")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            await _employeeService.DeleteAsync(id);
+            return RedirectToAction("ManageEmployees");
         }
 
         public async Task<IActionResult> DeleteProduct(int id)
@@ -155,20 +305,6 @@ namespace ProgAgriP2New.Controllers
             await _productService.DeleteAsync(id);
 
             return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> DeleteFarmer(int id)
-        {
-            // Check if user is authenticated as an employee
-            var userType = HttpContext.Session.GetString("UserType");
-
-            if (userType != "Employee")
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            await _farmerService.DeleteAsync(id);
-            return RedirectToAction("ManageFarmers");
         }
     }
 }

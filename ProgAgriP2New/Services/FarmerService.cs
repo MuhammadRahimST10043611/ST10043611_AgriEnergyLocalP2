@@ -8,11 +8,16 @@ namespace ProgAgriP2New.Services
     {
         private readonly IFarmerRepository _farmerRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IPasswordValidationService _passwordValidationService;
 
-        public FarmerService(IFarmerRepository farmerRepository, IProductRepository productRepository)
+        public FarmerService(
+            IFarmerRepository farmerRepository,
+            IProductRepository productRepository,
+            IPasswordValidationService passwordValidationService)
         {
             _farmerRepository = farmerRepository;
             _productRepository = productRepository;
+            _passwordValidationService = passwordValidationService;
         }
 
         public async Task<Farmer> GetByIdAsync(int farmerId)
@@ -25,8 +30,21 @@ namespace ProgAgriP2New.Services
             return await _farmerRepository.GetAllAsync();
         }
 
-        public async Task AddAsync(FarmerViewModel farmerViewModel)
+        public async Task<(bool success, string errorMessage)> AddAsync(FarmerViewModel farmerViewModel)
         {
+            // Validate password
+            if (!_passwordValidationService.IsValidPassword(farmerViewModel.Password, out string errorMessage))
+            {
+                return (false, errorMessage);
+            }
+
+            // Check if email is already in use
+            var existingFarmer = await _farmerRepository.GetByEmailAsync(farmerViewModel.Email);
+            if (existingFarmer != null)
+            {
+                return (false, "Email is already in use.");
+            }
+
             var farmer = new Farmer
             {
                 Name = farmerViewModel.Name,
@@ -37,26 +55,45 @@ namespace ProgAgriP2New.Services
             };
 
             await _farmerRepository.AddAsync(farmer);
+            return (true, string.Empty);
         }
 
-        // New method for updating farmer details
-        public async Task UpdateAsync(FarmerViewModel farmerViewModel)
+        public async Task<(bool success, string errorMessage)> UpdateAsync(FarmerViewModel farmerViewModel)
         {
             var farmer = await _farmerRepository.GetByIdAsync(farmerViewModel.FarmerId);
 
-            if (farmer != null)
+            if (farmer == null)
             {
-                farmer.Name = farmerViewModel.Name;
-                farmer.Email = farmerViewModel.Email;
-                farmer.Password = farmerViewModel.Password;
-                farmer.Address = farmerViewModel.Address;
-                farmer.PhoneNumber = farmerViewModel.PhoneNumber;
-
-                await _farmerRepository.UpdateAsync(farmer);
+                return (false, "Farmer not found.");
             }
+
+            // Validate password if it changed
+            if (farmer.Password != farmerViewModel.Password &&
+                !_passwordValidationService.IsValidPassword(farmerViewModel.Password, out string errorMessage))
+            {
+                return (false, errorMessage);
+            }
+
+            // If email changed, check if the new email is available
+            if (farmer.Email != farmerViewModel.Email)
+            {
+                var existingFarmer = await _farmerRepository.GetByEmailAsync(farmerViewModel.Email);
+                if (existingFarmer != null && existingFarmer.FarmerId != farmerViewModel.FarmerId)
+                {
+                    return (false, "Email is already in use.");
+                }
+            }
+
+            farmer.Name = farmerViewModel.Name;
+            farmer.Email = farmerViewModel.Email;
+            farmer.Password = farmerViewModel.Password;
+            farmer.Address = farmerViewModel.Address;
+            farmer.PhoneNumber = farmerViewModel.PhoneNumber;
+
+            await _farmerRepository.UpdateAsync(farmer);
+            return (true, string.Empty);
         }
 
-        // New method for deleting a farmer
         public async Task DeleteAsync(int farmerId)
         {
             // First delete all products associated with this farmer
