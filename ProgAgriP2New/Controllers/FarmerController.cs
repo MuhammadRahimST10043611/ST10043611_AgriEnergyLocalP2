@@ -16,7 +16,7 @@ namespace ProgAgriP2New.Controllers
             _farmerService = farmerService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageSize = 20, int pageNumber = 1, string sortOrder = "desc")
         {
             // Check if user is authenticated as a farmer
             var userType = HttpContext.Session.GetString("UserType");
@@ -27,8 +27,9 @@ namespace ProgAgriP2New.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var products = await _productService.GetByFarmerIdAsync(userId.Value);
-            return View(products);
+            var viewModel = await _productService.GetFilteredProductsAsync(
+                userId.Value, null, null, null, pageSize, pageNumber, sortOrder);
+            return View(viewModel);
         }
 
         public IActionResult AddProduct()
@@ -147,7 +148,9 @@ namespace ProgAgriP2New.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> AllProducts(string category = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<IActionResult> AllProducts(string category = null,
+         DateTime? startDate = null, DateTime? endDate = null,
+         int pageSize = 20, int pageNumber = 1, string sortOrder = "desc")
         {
             // Check if user is authenticated as a farmer
             var userType = HttpContext.Session.GetString("UserType");
@@ -158,12 +161,15 @@ namespace ProgAgriP2New.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Get all categories first - this is important to show all possible categories
+            // Get all categories
             var categories = await _productService.GetDistinctCategoriesAsync();
 
             // Get all products (excluding current farmer's products)
-            var productFilter = await _productService.GetFilteredProductsAsync(null, category, startDate, endDate);
+            var productFilter = await _productService.GetFilteredProductsAsync(
+                null, category, startDate, endDate, pageSize, pageNumber, sortOrder);
+
             var products = productFilter.Products.Where(p => p.FarmerId != userId.Value).ToList();
+            productFilter.Products = products;
 
             // Get contact information for each farmer
             var farmerIds = products.Select(p => p.FarmerId).Distinct().ToList();
@@ -184,20 +190,25 @@ namespace ProgAgriP2New.Controllers
 
             // Pass data to view
             ViewBag.FarmerContacts = farmerContacts;
-            ViewBag.Categories = categories; // Use all possible categories, not just the filtered ones
+            ViewBag.Categories = categories;
             ViewBag.SelectedCategory = category;
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
+            ViewBag.PageSize = pageSize;
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.SortOrder = sortOrder;
 
-            return View(products);
+            return View(productFilter);
         }
-        
+
         [HttpPost]
         [ActionName("AllProducts")]
-        public async Task<IActionResult> AllProductsPost(string category, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> AllProductsPost(string category,
+            DateTime? startDate, DateTime? endDate, int pageSize = 20, string sortOrder = "desc")
         {
-            // Redirect to the GET method with the filter parameters
-            return RedirectToAction("AllProducts", new { category, startDate, endDate });
+            // Redirect to the GET method with the filter parameters (reset to page 1)
+            return RedirectToAction("AllProducts",
+                new { category, startDate, endDate, pageSize, pageNumber = 1, sortOrder });
         }
     }
 }

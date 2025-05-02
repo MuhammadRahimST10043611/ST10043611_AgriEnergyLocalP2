@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ProgAgriP2New.Models.ViewModels.ProductViewModel>
+﻿@model ProgAgriP2New.Models.ViewModels.ProductFilterViewModel
 
 @{
     ViewData["Title"] = "All Farmers Products";
@@ -18,7 +18,7 @@
         <div class="card-body">
             <form asp-action="AllProducts" method="post">
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="category">Category:</label>
                         <select class="form-control" id="category" name="category">
                             <option value="">All Categories</option>
@@ -29,26 +29,50 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-2 mb-3">
                         <label for="startDate">Start Date:</label>
                         <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-2 mb-3">
                         <label for="endDate">End Date:</label>
                         <input type="date" class="form-control" id="endDate" name="endDate" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label for="pageSize">Items per page:</label>
+                        <select class="form-control" id="pageSize" name="pageSize">
+                            @foreach (var size in new[] { 20, 50, 100 })
+                            {
+                                <option value="@size" selected="@(ViewBag.PageSize == size)">@size</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Sort Order:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sortOrder" id="sortDesc"
+                                   value="desc" @(ViewBag.SortOrder == "desc" ? "checked" : "")>
+                            <label class="form-check-label" for="sortDesc">Newest First</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sortOrder" id="sortAsc"
+                                   value="asc" @(ViewBag.SortOrder == "asc" ? "checked" : "")>
+                            <label class="form-check-label" for="sortAsc">Oldest First</label>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
                     <a asp-action="AllProducts" class="btn btn-secondary">Reset</a>
                 </div>
             </form>
         </div>
     </div>
 
-    @if (Model != null && Model.Any())
+    @if (Model.Products != null && Model.Products.Any())
     {
         <div class="table-responsive">
             <table class="table table-striped">
@@ -62,7 +86,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var product in Model)
+                    @foreach (var product in Model.Products)
                     {
                         <tr>
                             <td>@product.FarmerName</td>
@@ -84,6 +108,65 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Showing @(((ViewBag.CurrentPage - 1) * ViewBag.PageSize) + 1) to @(Math.Min(ViewBag.CurrentPage * ViewBag.PageSize, Model.TotalItems)) of @Model.TotalItems items</p>
+                </div>
+                <div class="col-md-6">
+                    <ul class="pagination justify-content-end">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="AllProducts" asp-route-pageNumber="1"
+                                   asp-route-category="@ViewBag.SelectedCategory"
+                                   asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-pageSize="@ViewBag.PageSize" asp-route-sortOrder="@ViewBag.SortOrder">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-action="AllProducts" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)"
+                                   asp-route-category="@ViewBag.SelectedCategory"
+                                   asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-pageSize="@ViewBag.PageSize" asp-route-sortOrder="@ViewBag.SortOrder">&laquo;</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(Model.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="AllProducts" asp-route-pageNumber="@i"
+                                   asp-route-category="@ViewBag.SelectedCategory"
+                                   asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-pageSize="@ViewBag.PageSize" asp-route-sortOrder="@ViewBag.SortOrder">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="AllProducts" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)"
+                                   asp-route-category="@ViewBag.SelectedCategory"
+                                   asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-pageSize="@ViewBag.PageSize" asp-route-sortOrder="@ViewBag.SortOrder">&raquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-action="AllProducts" asp-route-pageNumber="@Model.TotalPages"
+                                   asp-route-category="@ViewBag.SelectedCategory"
+                                   asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                                   asp-route-pageSize="@ViewBag.PageSize" asp-route-sortOrder="@ViewBag.SortOrder">Last</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
     }
     else
     {
@@ -92,3 +175,24 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        // Auto-submit the form when page size or sort order changes
+        document.addEventListener('DOMContentLoaded', function() {
+            // For page size change
+            document.querySelectorAll('select[name="pageSize"]').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            });
+
+            // For sort order change
+            document.querySelectorAll('input[name="sortOrder"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            });
+        });
+    </script>
+}

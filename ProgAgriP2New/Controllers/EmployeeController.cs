@@ -20,8 +20,10 @@ namespace ProgAgriP2New.Controllers
             _employeeService = employeeService;
         }
 
-        public async Task<IActionResult> Index()
-        {
+        [HttpGet]
+        public async Task<IActionResult> Index(int? farmerId, string category,
+            DateTime? startDate, DateTime? endDate, int pageSize = 20, int pageNumber = 1, string sortOrder = "desc")
+                {
             // Check if user is authenticated as an employee
             var userType = HttpContext.Session.GetString("UserType");
 
@@ -30,12 +32,14 @@ namespace ProgAgriP2New.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var viewModel = await _productService.GetFilteredProductsAsync(null, null, null, null);
+            var viewModel = await _productService.GetFilteredProductsAsync(
+                farmerId, category, startDate, endDate, pageSize, pageNumber, sortOrder);
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(int? farmerId, string category, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Index(int? farmerId, string category,
+            DateTime? startDate, DateTime? endDate, int pageSize = 20, string sortOrder = "desc")
         {
             // Check if user is authenticated as an employee
             var userType = HttpContext.Session.GetString("UserType");
@@ -45,10 +49,11 @@ namespace ProgAgriP2New.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var viewModel = await _productService.GetFilteredProductsAsync(farmerId, category, startDate, endDate);
+            // Reset to page 1 when filter changes
+            var viewModel = await _productService.GetFilteredProductsAsync(
+                farmerId, category, startDate, endDate, pageSize, 1, sortOrder);
             return View(viewModel);
         }
-
         public IActionResult AddFarmer()
         {
             // Check if user is authenticated as an employee

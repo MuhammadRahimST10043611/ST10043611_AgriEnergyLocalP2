@@ -33,7 +33,7 @@ namespace ProgAgriP2New.Repositories
             return await _context.Products.Include(p => p.Farmer).ToListAsync();
         }
 
-        public async Task<IEnumerable<Product>> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate)
+        public async Task<(IEnumerable<Product> Products, int TotalCount)> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber, string sortOrder = "desc")
         {
             var query = _context.Products.Include(p => p.Farmer).AsQueryable();
 
@@ -57,7 +57,26 @@ namespace ProgAgriP2New.Repositories
                 query = query.Where(p => p.ProductionDate <= endDate.Value);
             }
 
-            return await query.ToListAsync();
+            // Sort by production date
+            if (sortOrder.ToLower() == "asc")
+            {
+                query = query.OrderBy(p => p.ProductionDate);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.ProductionDate);
+            }
+
+            // Get total count for pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (products, totalCount);
         }
 
         public async Task<IEnumerable<string>> GetDistinctCategoriesAsync()

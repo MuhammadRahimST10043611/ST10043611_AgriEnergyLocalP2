@@ -9,7 +9,7 @@ namespace ProgAgriP2New.Services
         Task<ProductViewModel> GetByIdAsViewModelAsync(int productId);  // New method
         Task<IEnumerable<ProductViewModel>> GetByFarmerIdAsync(int farmerId);
         Task<IEnumerable<ProductViewModel>> GetAllAsync();
-        Task<ProductFilterViewModel> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate);
+        Task<ProductFilterViewModel> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate, int pageSize = 20, int pageNumber = 1, string sortOrder = "desc");
         Task<IEnumerable<string>> GetDistinctCategoriesAsync();
         Task AddAsync(int farmerId, string name, string category, DateTime productionDate);
         Task UpdateAsync(ProductViewModel productViewModel);  // New method

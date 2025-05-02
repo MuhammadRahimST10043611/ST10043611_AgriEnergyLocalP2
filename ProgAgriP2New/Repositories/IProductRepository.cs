@@ -7,7 +7,7 @@ namespace ProgAgriP2New.Repositories
         Task<Product> GetByIdAsync(int productId);
         Task<IEnumerable<Product>> GetByFarmerIdAsync(int farmerId);
         Task<IEnumerable<Product>> GetAllAsync();
-        Task<IEnumerable<Product>> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate);
+        Task<(IEnumerable<Product> Products, int TotalCount)> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber, string sortOrder = "desc");
         Task<IEnumerable<string>> GetDistinctCategoriesAsync();
         Task AddAsync(Product product);
         Task UpdateAsync(Product product); // New method

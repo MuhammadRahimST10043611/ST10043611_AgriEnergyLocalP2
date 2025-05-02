@@ -68,9 +68,11 @@ namespace ProgAgriP2New.Services
             }).ToList();
         }
 
-        public async Task<ProductFilterViewModel> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate)
+        public async Task<ProductFilterViewModel> GetFilteredProductsAsync(int? farmerId, string category, DateTime? startDate, DateTime? endDate, int pageSize = 20, int pageNumber = 1, string sortOrder = "desc")
         {
-            var products = await _productRepository.GetFilteredProductsAsync(farmerId, category, startDate, endDate);
+            var (products, totalCount) = await _productRepository.GetFilteredProductsAsync(
+                farmerId, category, startDate, endDate, pageSize, pageNumber, sortOrder);
+
             var farmers = await _farmerRepository.GetAllAsync();
             var categories = await _productRepository.GetDistinctCategoriesAsync();
 
@@ -80,6 +82,9 @@ namespace ProgAgriP2New.Services
                 Category = category,
                 StartDate = startDate,
                 EndDate = endDate,
+                PageSize = pageSize,
+                CurrentPage = pageNumber,
+                TotalItems = totalCount,
                 Products = products.Select(p => new ProductViewModel
                 {
                     ProductId = p.ProductId,
@@ -90,7 +95,8 @@ namespace ProgAgriP2New.Services
                     ProductionDate = p.ProductionDate
                 }).ToList(),
                 Farmers = farmers.ToList(),
-                Categories = categories.ToList()
+                Categories = categories.ToList(),
+                SortOrder = sortOrder
             };
         }
 
