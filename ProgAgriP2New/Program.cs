@@ -52,9 +52,10 @@ app.UseAuthorization();
 
 app.UseSession();
 
+// Updated default route to point to the landing page
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Landing}/{id?}");
 
 // Initialize/seed the database
 using (var scope = app.Services.CreateScope())

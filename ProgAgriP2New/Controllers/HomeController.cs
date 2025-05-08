@@ -1,7 +1,6 @@
 using ProgAgriP2New.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using ProgAgriP2New.Models;
 
 namespace ProgAgriP2New.Controllers
 {
@@ -12,6 +11,12 @@ namespace ProgAgriP2New.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+        }
+
+        // New Landing page action
+        public IActionResult Landing()
+        {
+            return View();
         }
 
         public IActionResult Index()
