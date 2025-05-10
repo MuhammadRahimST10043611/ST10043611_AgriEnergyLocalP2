@@ -65,25 +65,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleButton = document.querySelector('.toggle-password');
-            const passwordInput = document.getElementById('Password');
-
-            toggleButton.addEventListener('click', function() {
-                // Toggle the password field type
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-
-                // Toggle the button text and icon
-                if (type === 'text') {
-                    toggleButton.innerHTML = '<i class="bi bi-eye-slash"></i> Hide';
-                } else {
-                    toggleButton.innerHTML = '<i class="bi bi-eye"></i> Show';
-                }
-            });
-        });
-    </script>
-}

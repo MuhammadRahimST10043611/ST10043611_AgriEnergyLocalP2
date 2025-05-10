@@ -32,7 +32,7 @@
                         <div class="input-group">
                             <input type="password" class="form-control" id="Password" name="Password" required />
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                <i class="bi bi-eye" id="toggleIcon"></i> Show
+                                <i class="bi bi-eye"></i> Show
                             </button>
                         </div>
                     </div>
@@ -45,30 +45,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('Password');
-            const toggleIcon = document.getElementById('toggleIcon');
-
-            togglePassword.addEventListener('click', function() {
-                // Toggle the password field type
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-
-                // Toggle the button text and icon
-                if (type === 'text') {
-                    togglePassword.textContent = ' Hide';
-                    togglePassword.prepend(document.createElement('i'));
-                    togglePassword.querySelector('i').className = 'bi bi-eye-slash';
-                } else {
-                    togglePassword.textContent = ' Show';
-                    togglePassword.prepend(document.createElement('i'));
-                    togglePassword.querySelector('i').className = 'bi bi-eye';
-                }
-            });
-        });
-    </script>
-}
