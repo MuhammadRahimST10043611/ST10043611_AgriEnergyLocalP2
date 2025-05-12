@@ -18,7 +18,7 @@
                             @ViewBag.ErrorMessage
                         </div>
                     }
-
+                    <!-- Form to submit new employee details -->
                     <form asp-action="AddEmployee" method="post">
                         <div class="form-group mb-3">
                             <label for="Name">Employee Name:</label>
@@ -29,7 +29,7 @@
                             <label for="Email">Email:</label>
                             <input type="email" class="form-control" id="Email" name="Email" required />
                         </div>
-
+                        <!-- Input for password with show/hide toggle -->
                         <div class="form-group mb-3">
                             <label for="Password">Password:</label>
                             <div class="input-group">
@@ -42,7 +42,7 @@
                                 Password must contain at least one number and one special character.
                             </small>
                         </div>
-
+                        <!-- Submit button and cancel link -->
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary">Add Employee</button>
                             <a asp-action="ManageEmployees" class="btn btn-secondary">Cancel</a>

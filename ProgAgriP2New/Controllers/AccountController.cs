@@ -33,6 +33,7 @@ namespace ProgAgriP2New.Controllers
                     HttpContext.Session.SetInt32("UserId", userId);
                     HttpContext.Session.SetString("UserEmail", model.Email);
 
+                    // Redirect based on user role
                     if (role == "Farmer")
                     {
                         return RedirectToAction("Index", "Farmer");
@@ -49,6 +50,7 @@ namespace ProgAgriP2New.Controllers
             return View(model);
         }
 
+        // Clear session data and redirect to login page
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
