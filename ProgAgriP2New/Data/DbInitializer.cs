@@ -23,19 +23,19 @@ namespace ProgAgriP2New.Data
                 {
                     Name = "Pep Guardiola",
                     Email = "pep@progagri.com",
-                    Password = "Admin123"
+                    Password = "Admin123!"
                 },
                 new Employee
                 {
                     Name = "Jurgen Klopp",
                     Email = "klopp@progagri.com",
-                    Password = "Admin123"
+                    Password = "Admin123!"
                 },
                 new Employee
                 {
                     Name = "Carlo Ancelotti",
                     Email = "carlo@progagri.com",
-                    Password = "Admin123"
+                    Password = "Admin123!"
                 }
             };
 
@@ -49,7 +49,7 @@ namespace ProgAgriP2New.Data
                 {
                     Name = "Lionel Messi",
                     Email = "messi@farm.com",
-                    Password = "Farmer123",
+                    Password = "Farmer123!",
                     Address = "10 Vineyard Avenue, Constantia, Cape Town",
                     PhoneNumber = "021-555-1010"
                 },
@@ -57,7 +57,7 @@ namespace ProgAgriP2New.Data
                 {
                     Name = "Cristiano Ronaldo",
                     Email = "ronaldo@farm.com",
-                    Password = "Farmer123",
+                    Password = "Farmer123!",
                     Address = "7 Mountain View Road, Hout Bay, Cape Town",
                     PhoneNumber = "021-555-0777"
                 },
@@ -65,7 +65,7 @@ namespace ProgAgriP2New.Data
                 {
                     Name = "Mohamed Salah",
                     Email = "salah@farm.com",
-                    Password = "Farmer123",
+                    Password = "Farmer123!",
                     Address = "11 Ocean Drive, Sea Point, Cape Town",
                     PhoneNumber = "021-555-1111"
                 },
@@ -73,7 +73,7 @@ namespace ProgAgriP2New.Data
                 {
                     Name = "Kevin De Bruyne",
                     Email = "kdb@farm.com",
-                    Password = "Farmer123",
+                    Password = "Farmer123!",
                     Address = "17 Table Mountain Road, Camps Bay, Cape Town",
                     PhoneNumber = "021-555-1717"
                 }
