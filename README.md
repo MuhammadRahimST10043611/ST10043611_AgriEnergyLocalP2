@@ -258,7 +258,7 @@ Farmers:
 Employees:
 1.	Pep Guardiola
 •	Email: pep@progagri.com
-•	Password: Admin12!				
+•	Password: Admin12!#				
 2.	Jurgen Klopp
 •	Email: klopp@progagri.com
 •	Password: Admin123@
